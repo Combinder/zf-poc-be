@@ -18,4 +18,5 @@ EXPOSE 8086
 RUN useradd --create-home appuser && chown -R appuser /app
 USER appuser
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8086", "--workers", "2", "app:app"]
+# CMD ["gunicorn", "--bind", "0.0.0.0:8086", "--workers", "2", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8086", "--workers", "1", "--capture-output", "--log-level=debug", "app:app"]

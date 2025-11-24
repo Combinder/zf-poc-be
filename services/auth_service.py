@@ -5,6 +5,8 @@ import requests
 from urllib.parse import urlencode
 from dotenv import load_dotenv
 
+from flask import Blueprint, request, current_app
+
 load_dotenv()
 
 AUTH_DOMAIN = os.getenv("AUTH_DOMAIN")
@@ -29,12 +31,13 @@ def build_authorization_url():
 
 
 def exchange_code_for_token(code):
+    current_app.logger.info(f"exchanging code for access_token: {code}")
+
     """Exchange authorization code for access + refresh tokens."""
     token_url = f"{AUTH_DOMAIN}/oauth/token"
     payload = {
         "grant_type": "authorization_code",
         "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
         "code": code,
         "redirect_uri": REDIRECT_URI,
     }

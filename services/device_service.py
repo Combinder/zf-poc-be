@@ -1,6 +1,7 @@
 import os
 import requests
 
+from flask import Blueprint, request, current_app
 from services.auth_service import get_access_token
 
 BASE_URL = os.getenv("BASE_URL")
@@ -22,13 +23,19 @@ def fetch_spaces(page=0, page_size=100):
     try:
         response = requests.get(url, headers=headers, params=params, timeout=10)
         response.raise_for_status()
+        current_app.logger.info(f"fetched spaces {response.status_code}")
         return response.json(), None
     except requests.exceptions.RequestException as e:
         return None, str(e)
 
 
-def fetch_device_readings(device_id, start_time, end_time, resolution, measurement):
+def fetch_device_readings_v1(device_id, start_time, end_time, resolution, measurement):
     """Handles external API call to fetch device readings."""
+    current_app.logger.info(f"about to fetch readings for device with id: {device_id}")
+    current_app.logger.info(f"startTime: {start_time}")
+    current_app.logger.info(f"endTime: {end_time}")
+    current_app.logger.info(f"resolution: {resolution}")
+    current_app.logger.info(f"measurement: {measurement}")
     url = f"{BASE_URL}/devices/{device_id}/readings"
     headers = {
         "Authorization": f"Bearer {get_access_token()}",
@@ -46,6 +53,39 @@ def fetch_device_readings(device_id, start_time, end_time, resolution, measureme
         response.raise_for_status()
         return response.json(), None
     except requests.exceptions.RequestException as e:
+        return None, str(e)
+
+
+def fetch_device_readings(device_id, start_time, end_time, resolution, measurement):
+    """Handles external API call to fetch device readings."""
+
+    current_app.logger.info(f"[readings] device_id={device_id}")
+    current_app.logger.info(f"[readings] start={start_time}, end={end_time}, res={resolution}, m={measurement}")
+
+    url = f"{BASE_URL}/devices/{device_id}/readings"
+    headers = {
+        "Authorization": f"Bearer {get_access_token()}",
+        "Accept": "application/json",
+    }
+    params = {
+        "startTime": start_time,
+        "endTime": end_time,
+        "resolution": resolution,
+        "measurement": measurement,
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params=params, timeout=10)
+        response.raise_for_status()
+        return response.json(), None
+    except requests.exceptions.RequestException as e:
+        current_app.logger.error("[readings] REQUEST FAILED", exc_info=True)
+
+        try:
+            current_app.logger.error(f"[readings] access_token startswith={headers['Authorization'][:15]}")
+        except:
+            pass
+
         return None, str(e)
 
 

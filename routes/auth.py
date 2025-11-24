@@ -7,7 +7,7 @@ auth_bp = Blueprint("auth", __name__)
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 
-@auth_bp.route("/auth/login", methods=["GET"])
+@auth_bp.route("/auth/sign-in", methods=["GET"])
 def login():
     """Return the Auth0 authorization URL so the frontend can redirect."""
     url = build_authorization_url()
