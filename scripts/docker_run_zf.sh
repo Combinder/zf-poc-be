@@ -3,4 +3,4 @@ docker run -d --name zf-poc-be \
   --network network1 \
   --ip 10.0.2.135 \
   --env-file /mnt/vol0/docker/zf-poc-be/prod.env \
-  zf-poc-be:v0.1.0
+  zf-poc-be:v0.1.8
